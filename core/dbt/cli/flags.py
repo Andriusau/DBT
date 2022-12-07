@@ -20,7 +20,7 @@ if os.name != "nt":
 
 @dataclass(frozen=True)
 class Flags:
-    def __init__(self, ctx: Context = None, user_config: UserConfig = None) -> None:
+    def __init__(self, ctx: Context = None, user_config: UserConfig = None, args=sys.argv) -> None:
 
         if ctx is None:
             ctx = get_current_context()
@@ -50,7 +50,7 @@ class Flags:
             invoked_subcommand = getattr(import_module("dbt.cli.main"), invoked_subcommand_name)
             invoked_subcommand.allow_extra_args = True
             invoked_subcommand.ignore_unknown_options = True
-            invoked_subcommand_ctx = invoked_subcommand.make_context(None, sys.argv)
+            invoked_subcommand_ctx = invoked_subcommand.make_context(None, args)
             assign_params(invoked_subcommand_ctx, params_assigned_from_default)
 
         if not user_config:
