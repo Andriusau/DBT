@@ -61,7 +61,7 @@ def cli(ctx, **kwargs):
     For more documentation on these commands, visit: docs.getdbt.com
     """
     # Get primatives
-    flags = Flags()
+    flags = Flags(args=ctx.args)
 
     # Logging
     # N.B. Legacy logger is not supported
@@ -238,6 +238,7 @@ def debug(ctx, **kwargs):
 @p.project_dir
 @p.target
 @p.vars
+@p.threads
 def deps(ctx, **kwargs):
     """Pull the most recent version of the dependencies listed in packages.yml"""
     flags = Flags()
