@@ -1,11 +1,11 @@
 # TODO  Move this to /core/dbt/flags.py when we're ready to break things
 import os
-import sys
 from dataclasses import dataclass
 from importlib import import_module
 from multiprocessing import get_context
 from pprint import pformat as pf
 from typing import Set
+from contextvars import ContextVar
 
 from click import Context, get_current_context
 from click.core import ParameterSource
@@ -16,6 +16,17 @@ from dbt.contracts.project import UserConfig
 if os.name != "nt":
     # https://bugs.python.org/issue41567
     import multiprocessing.popen_spawn_posix  # type: ignore  # noqa: F401
+
+
+INVOCATION_ARGS: ContextVar[list[str]] = ContextVar("invocation_args")
+
+
+def set_invocation_args(args):
+    INVOCATION_ARGS.set(args)
+
+
+def get_invocation_args():
+    return INVOCATION_ARGS.get()
 
 
 @dataclass(frozen=True)
@@ -50,7 +61,7 @@ class Flags:
             invoked_subcommand = getattr(import_module("dbt.cli.main"), invoked_subcommand_name)
             invoked_subcommand.allow_extra_args = True
             invoked_subcommand.ignore_unknown_options = True
-            invoked_subcommand_ctx = invoked_subcommand.make_context(None, sys.argv)
+            invoked_subcommand_ctx = invoked_subcommand.make_context(None, get_invocation_args())
             assign_params(invoked_subcommand_ctx, params_assigned_from_default)
 
         if not user_config:

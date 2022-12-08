@@ -4,19 +4,21 @@ from click.exceptions import NoSuchOption, UsageError
 from dbt.cli.main import cli
 from dbt.config.project import Project
 
+
 class DBTUsageException(Exception):
     pass
 
+
 class DBTContext(Context):
     def __init__(self, args: List[str]) -> None:
-        try: 
+        try:
             ctx = cli.make_context(cli.name, args)
             if args:
                 cmd_name, cmd, cmd_args = cli.resolve_command(ctx, args)
-                cmd.make_context(cmd_name, cmd_args, parent=ctx)
+                cmd.make_context(cmd_name, cmd_args, parent=ctx)  # type: ignore
         except (NoSuchOption, UsageError) as e:
-            raise DBTUsageException(e.message) 
-        
+            raise DBTUsageException(e.message)
+
         ctx.obj = {}
         # yikes?
         self.__dict__.update(ctx.__dict__)
@@ -24,14 +26,14 @@ class DBTContext(Context):
 
     # @classmethod
     # def from_args(cls, args: List[str]) -> "DBTContext":
-    #     try: 
+    #     try:
     #         ctx = cli.make_context(cli.name, args)
     #         if args:
     #             cmd_name, cmd, cmd_args = cli.resolve_command(ctx, args)
     #             cmd.make_context(cmd_name, cmd_args, parent=ctx)
     #     except (NoSuchOption, UsageError) as e:
-    #         raise DBTUsageException(e.message) 
-        
+    #         raise DBTUsageException(e.message)
+
     #     ctx.obj = {}
     #     # yikes
     #     ctx.__class__ = cls
@@ -40,5 +42,5 @@ class DBTContext(Context):
     def set_project(self, project: Project):
         if not isinstance(project, Project):
             raise ValueError(f"{project} is a {type(project)}, expected a Project object.")
-        
+
         self.obj["project"] = project

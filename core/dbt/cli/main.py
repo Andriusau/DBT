@@ -1,13 +1,14 @@
 import inspect  # This is temporary for RAT-ing
 from copy import copy
 from pprint import pformat as pf  # This is temporary for RAT-ing
+import sys
 
 import click
 from dbt.adapters.factory import adapter_management
 from dbt.cli import params as p
-from dbt.cli.flags import Flags
 from dbt.config import RuntimeConfig
 from dbt.config.runtime import load_project, load_profile
+from dbt.cli.flags import Flags, set_invocation_args
 from dbt.events.functions import setup_event_logger
 from dbt.profiler import profiler
 from dbt.task.deps import DepsTask
@@ -20,6 +21,7 @@ def cli_runner():
     ls = copy(cli.commands["list"])
     ls.hidden = True
     cli.add_command(ls, "ls")
+    set_invocation_args(sys.argv[1:])
 
     # Run the cli
     cli()
